@@ -1,9 +1,10 @@
 import React from 'react';
 import VideoPlayer from './components/VideoPlayer';
+import './styles/VideoPlayer.css';
 
 function App() {
   return (
-    <div>
+    <div className="App">
       <VideoPlayer />
     </div>
   );
