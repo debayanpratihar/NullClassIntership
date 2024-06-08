@@ -1,93 +1,113 @@
 .video-player-container {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    background: #000;
-  }
-  
-  .video-player {
-    width: 100%;
-    height: 100%;
-  }
-  
-  .controls {
-    position: absolute;
-    bottom: 20px;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-  }
-  
-  .controls button, .controls select {
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.7);
-    border: none;
-    cursor: pointer;
-  }
-  
-  .gesture-area {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
-  
-  .comments-section {
-    position: absolute;
-    bottom: 60px;
-    left: 10px;
-    width: calc(100% - 20px);
-    max-height: 200px;
-    overflow-y: auto;
-    background: rgba(0, 0, 0, 0.8);
-    color: #fff;
-    padding: 10px;
-    border-radius: 5px;
-  }
-  
-  .comments-section h3 {
-    margin: 0 0 10px;
-    font-size: 18px;
-  }
-  
-  .comments-section ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .comments-section ul li {
-    margin-bottom: 10px;
-    padding: 5px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
-  }
-  
-  .comments-section form {
-    display: flex;
-    margin-top: 10px;
-  }
-  
-  .comments-section input {
-    flex: 1;
-    padding: 5px;
-    border-radius: 3px;
-    border: none;
-    margin-right: 10px;
-  }
-  
-  .comments-section button {
-    padding: 5px 10px;
-    border-radius: 3px;
-    border: none;
-    background: #007bff;
-    color: white;
-    cursor: pointer;
-  }
-  
-  .comments-section button:hover {
-    background: #0056b3;
-  }
-  
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: #000;
+  overflow: hidden;
+}
+
+.video-player {
+  position: relative;
+  width: 100%;
+  height: calc(100% - 50px);
+}
+
+.controls {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.video-title {
+  color: #fff;
+  margin-left: 10px;
+}
+
+.video-player-controls select {
+  margin-left: 10px; 
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.video-player-controls select:hover {
+  background-color: #555;
+}
+
+.video-player-controls select:focus {
+  transform: scale(1.05);
+}
+
+.gesture-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 50px);
+}
+
+.comments-section {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 300px;
+  background-color: #e7f8f9;
+  border: 1px solid #ccc;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border-radius: 10px; /* Added border radius */
+}
+
+.comments-section h3 {
+  margin-top: 0;
+  color: #219c82; /* Changed color */
+  font-size: 20px; /* Changed font size */
+  text-align: center; /* Centered text */
+  margin-bottom: 15px; /* Added margin */
+}
+
+.comments-section ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.comments-section li {
+  margin-bottom: 10px;
+  font-size: 16px; /* Changed font size */
+  color: #555; /* Changed color */
+}
+
+.comments-section form {
+  display: flex;
+  flex-direction: column;
+}
+
+.comments-section form input {
+  margin-bottom: 10px;
+  padding: 8px; /* Increased padding */
+  border: 1px solid #ccc;
+  border-radius: 5px; /* Added border radius */
+}
+
+.comments-section form button {
+  padding: 8px; /* Increased padding */
+  border: none;
+  background-color: #289da1;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 5px; /* Added border radius */
+}
+
+.comments-section form button:hover {
+  background-color: #0f3257;
+}

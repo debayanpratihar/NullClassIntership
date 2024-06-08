@@ -4,7 +4,24 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getWeather } from '../weatherService';
 import { useGeolocated } from 'react-geolocated';
+import VideoPlayerControls from './VideoPlayerControls';
 import '../styles/VideoPlayer.css';
+
+// Import videos
+import video1_320p from '../videos/video1_320p.mp4';
+import video1_480p from '../videos/video1_480p.mp4';
+import video1_720p from '../videos/video1_720p.mp4';
+import video1_1080p from '../videos/video1_1080p.mp4';
+
+import video2_320p from '../videos/video2_320p.mp4';
+import video2_480p from '../videos/video2_480p.mp4';
+import video2_720p from '../videos/video2_720p.mp4';
+import video2_1080p from '../videos/video2_1080p.mp4';
+
+import video3_320p from '../videos/video3_320p.mp4';
+import video3_480p from '../videos/video3_480p.mp4';
+import video3_720p from '../videos/video3_720p.mp4';
+import video3_1080p from '../videos/video3_1080p.mp4';
 
 const VideoPlayer = () => {
   const playerRef = useRef(null);
@@ -19,38 +36,48 @@ const VideoPlayer = () => {
     { id: 3, text: 'I loved it!' }
   ]);
   const [newComment, setNewComment] = useState('');
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
 
-  const { coords } = useGeolocated({ positionOptions: { enableHighAccuracy: false } });
+  const { coords } = useGeolocated({
+    positionOptions: { enableHighAccuracy: false },
+    userDecisionTimeout: 5000,
+  });
 
+  const qualities = ['320p', '480p', '720p', '1080p'];
   const videos = [
     {
       title: 'Video 1',
       qualities: {
-        '320p': '/videos/video1_320p.mp4',
-        '480p': '/videos/video1_480p.mp4',
-        '720p': '/videos/video1_720p.mp4',
-        '1080p': '/videos/video1_1080p.mp4',
+        '320p': video1_320p,
+        '480p': video1_480p,
+        '720p': video1_720p,
+        '1080p': video1_1080p,
       },
     },
     {
       title: 'Video 2',
       qualities: {
-        '320p': '/videos/video2_320p.mp4',
-        '480p': '/videos/video2_480p.mp4',
-        '720p': '/videos/video2_720p.mp4',
-        '1080p': '/videos/video2_1080p.mp4',
+        '320p': video2_320p,
+        '480p': video2_480p,
+        '720p': video2_720p,
+        '1080p': video2_1080p,
       },
     },
     {
       title: 'Video 3',
       qualities: {
-        '320p': '/videos/video3_320p.mp4',
-        '480p': '/videos/video3_480p.mp4',
-        '720p': '/videos/video3_720p.mp4',
-        '1080p': '/videos/video3_1080p.mp4',
+        '320p': video3_320p,
+        '480p': video3_480p,
+        '720p': video3_720p,
+        '1080p': video3_1080p,
       },
     },
   ];
+
+  useEffect(() => {
+    playerRef.current.seekTo(0);
+  }, [videoIndex, videoQuality]);
 
   const handleDoubleTap = (side) => {
     const currentTime = playerRef.current.getCurrentTime();
@@ -61,25 +88,29 @@ const VideoPlayer = () => {
     setPlaying(!playing);
   };
 
-  const handleTripleTap = (side) => {
+  const handleTripleTap = (side, clickX) => {
+    const screenWidth = window.innerWidth;
+    const rightThreshold = screenWidth * 0.75; // Two right sections
+    const leftThreshold = screenWidth * 0.25; // Two left sections
+
     if (side === 'middle') {
-      // Move to next video
-      setVideoIndex((prevIndex) => (prevIndex + 1) % videos.length);
-    } else if (side === 'right') {
-      // Close the website
+      if (clickX > leftThreshold && clickX < rightThreshold) {
+        setVideoIndex((prevIndex) => (prevIndex + 1) % videos.length);
+      }
+    } else if (side === 'right' && clickX > rightThreshold) {
       window.close();
-    } else if (side === 'left') {
-      // Show comment section
+    } else if (side === 'left' && clickX < leftThreshold) {
       setShowComments(true);
     }
   };
 
   const handleTopRightTap = async () => {
     if (coords) {
-      const location = `${coords.latitude},${coords.longitude}`;
-      const weatherData = await getWeather(location);
+      const { latitude, longitude } = coords;
+      const weatherData = await getWeather(latitude, longitude);
       if (weatherData) {
-        toast.info(`Current location: ${weatherData.locations[location].address}, Temp: ${weatherData.locations[location].values[0].temp}°F`);
+        const location = `${latitude},${longitude}`;
+        toast.info(`Current location: ${weatherData.locations[location].address}, Temp: ${weatherData.locations[location].values[0].temp}°C`);
       } else {
         toast.error('Unable to fetch weather data');
       }
@@ -96,12 +127,11 @@ const VideoPlayer = () => {
     setPlaybackRate(1);
   };
 
-  const changeQuality = (event) => {
-    setVideoQuality(event.target.value);
-  };
-
-  const changeVideo = (event) => {
-    setVideoIndex(parseInt(event.target.value));
+  const handleQualityChange = (quality) => {
+    const currentVideo = videos[videoIndex];
+    if (currentVideo.qualities[quality]) {
+      setVideoQuality(quality);
+    }
   };
 
   const handleCommentChange = (e) => {
@@ -116,6 +146,45 @@ const VideoPlayer = () => {
     setNewComment('');
   };
 
+  const handleGesture = (e) => {
+    const clickX = e.clientX;
+    const clickY = e.clientY;
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+
+    if (e.detail === 2) {
+      if (clickX > screenWidth / 2) {
+        handleDoubleTap('right');
+      } else {
+        handleDoubleTap('left');
+      }
+    } else if (e.detail === 1) {
+      if (clickX > screenWidth * 0.75 && clickY < screenHeight * 0.25) {
+        handleTopRightTap();
+      } else if (clickX > screenWidth / 4 && clickX < (3 * screenWidth) / 4) {
+        handleSingleTapMiddle();
+      }
+    } else if (e.detail === 3) {
+      handleTripleTap('left', clickX);
+      handleTripleTap('middle', clickX);
+      handleTripleTap('right', clickX);
+    }
+  };
+
+  const handleProgress = (state) => {
+    setProgress(state.playedSeconds);
+  };
+
+  const handleDuration = (duration) => {
+    setDuration(duration);
+  };
+
+  const formatTime = (seconds) => {
+    const date = new Date(0);
+    date.setSeconds(seconds);
+    return date.toISOString().substr(11, 8);
+  };
+
   return (
     <div className="video-player-container">
       <div className="video-player">
@@ -126,50 +195,31 @@ const VideoPlayer = () => {
           playbackRate={playbackRate}
           width="100%"
           height="100%"
+          onProgress={handleProgress}
+          onDuration={handleDuration}
         />
       </div>
       <div className="controls">
-        <button onClick={() => handleDoubleTap('left')}>Backward 10s</button>
-        <button onClick={handleSingleTapMiddle}>{playing ? 'Pause' : 'Play'}</button>
-        <button onClick={() => handleDoubleTap('right')}>Forward 10s</button>
-        <select onChange={changeVideo} value={videoIndex}>
-          {videos.map((video, index) => (
-            <option key={index} value={index}>{video.title}</option>
-          ))}
-        </select>
-        <select onChange={changeQuality} value={videoQuality}>
-          <option value="320p">320p</option>
-          <option value="480p">480p</option>
-          <option value="720p">720p</option>
-          <option value="1080p">1080p</option>
-        </select>
+        <span className="video-title">{videos[videoIndex].title}</span>
+        <VideoPlayerControls
+          qualities={qualities}
+          currentQuality={videoQuality}
+          setQuality={handleQualityChange}
+        />
+      </div>
+      <div className="progress-bar-container">
+        <span>{formatTime(progress)}</span>
+        <div className="progress-bar">
+          <div
+            className="progress"
+            style={{ width: `${(progress / duration) * 100}%` }}
+          />
+        </div>
+        <span>{formatTime(duration)}</span>
       </div>
       <div
         className="gesture-area"
-        onDoubleClick={(e) => {
-          if (e.clientX > window.innerWidth / 2) {
-            handleDoubleTap('right');
-          } else {
-            handleDoubleTap('left');
-          }
-        }}
-        onClick={(e) => {
-          if (e.detail === 1) {
-            if (e.clientX > window.innerWidth * 0.75 && e.clientY < window.innerHeight * 0.25) {
-              handleTopRightTap();
-            } else if (e.clientX > window.innerWidth / 4 && e.clientX < (3 * window.innerWidth) / 4) {
-              handleSingleTapMiddle();
-            }
-          } else if (e.detail === 3) {
-            if (e.clientX > window.innerWidth / 2) {
-              handleTripleTap('right');
-            } else if (e.clientX < window.innerWidth / 2) {
-              handleTripleTap('left');
-            } else {
-              handleTripleTap('middle');
-            }
-          }
-        }}
+        onClick={handleGesture}
         onMouseDown={(e) => {
           if (e.clientX > window.innerWidth / 2) {
             handleHold('right');
@@ -196,6 +246,7 @@ const VideoPlayer = () => {
             />
             <button type="submit">Submit</button>
           </form>
+          <button onClick={() => setShowComments(false)}>Close Comments</button>
         </div>
       )}
       <ToastContainer />
