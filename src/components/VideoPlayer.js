@@ -7,7 +7,7 @@ import { useGeolocated } from 'react-geolocated';
 import VideoPlayerControls from './VideoPlayerControls';
 import '../styles/VideoPlayer.css';
 
-// Import videos
+
 import video1_320p from '../videos/video1_320p.mp4';
 import video1_480p from '../videos/video1_480p.mp4';
 import video1_720p from '../videos/video1_720p.mp4';
